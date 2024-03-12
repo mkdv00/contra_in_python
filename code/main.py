@@ -1,5 +1,7 @@
 import pygame
-from settings import WINDOW_WIDTH, WINDOW_HEIGHT, LAYERS
+from settings import *
+from pytmx.util_pygame import load_pygame
+from tile import Tile
 
 
 class Game:
@@ -8,7 +10,19 @@ class Game:
         pygame.init()
         self.screen = pygame.display.set_mode(size=(WINDOW_WIDTH, WINDOW_HEIGHT))
         self.clock = pygame.time.Clock()
+        self.tile_size = 64
         pygame.display.set_caption('Contra shooter')
+        
+        # groups
+        self.all_sprites = pygame.sprite.Group()
+        
+        self.setup()
+    
+    def setup(self):
+        tmx_map = load_pygame('data/map.tmx')
+        
+        for x, y, surf in tmx_map.get_layer_by_name('Level').tiles():
+            Tile(pos=(x * self.tile_size, y * self.tile_size), surf=surf, groups=self.all_sprites)
     
     def run(self, is_run: bool = True):
         while is_run:
@@ -22,6 +36,12 @@ class Game:
             
             # bg
             self.screen.fill((249, 131, 103))
+            
+            # updates
+            self.all_sprites.update(dt)
+            
+            # draw
+            self.all_sprites.draw(surface=self.screen)
             
             pygame.display.update()
         
