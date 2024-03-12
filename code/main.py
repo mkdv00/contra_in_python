@@ -37,7 +37,7 @@ class Game:
         # Objects
         for obj in tmx_map.get_layer_by_name('Entities'):
             if obj.name == 'Player':
-                self.player = Player(pos=(obj.x, obj.y), groups=self.all_sprites)
+                self.player = Player(pos=(obj.x, obj.y), groups=self.all_sprites, path='graphics/player')
     
     def run(self, is_run: bool = True):
         while is_run:
