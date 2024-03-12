@@ -1,7 +1,9 @@
 import pygame
-from settings import *
+from player import Player
 from pytmx.util_pygame import load_pygame
+from settings import *
 from tile import Tile
+from camera import CameraGroup
 
 
 class Game:
@@ -14,7 +16,7 @@ class Game:
         pygame.display.set_caption('Contra shooter')
         
         # groups
-        self.all_sprites = pygame.sprite.Group()
+        self.all_sprites = CameraGroup()
         
         self.setup()
     
@@ -23,6 +25,10 @@ class Game:
         
         for x, y, surf in tmx_map.get_layer_by_name('Level').tiles():
             Tile(pos=(x * self.tile_size, y * self.tile_size), surf=surf, groups=self.all_sprites)
+        
+        for obj in tmx_map.get_layer_by_name('Entities'):
+            if obj.name == 'Player':
+                self.player = Player(pos=(obj.x, obj.y), groups=self.all_sprites)
     
     def run(self, is_run: bool = True):
         while is_run:
@@ -41,7 +47,7 @@ class Game:
             self.all_sprites.update(dt)
             
             # draw
-            self.all_sprites.draw(surface=self.screen)
+            self.all_sprites.draw_custom(player=self.player)
             
             pygame.display.update()
         
