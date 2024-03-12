@@ -22,10 +22,19 @@ class Game:
     
     def setup(self):
         tmx_map = load_pygame('data/map.tmx')
+        layers = ['BG', 'BG Detail', 'FG Detail Bottom', 'FG Detail Top']
         
+        # Tiles
         for x, y, surf in tmx_map.get_layer_by_name('Level').tiles():
-            Tile(pos=(x * self.tile_size, y * self.tile_size), surf=surf, groups=self.all_sprites)
+            Tile(pos=(x * self.tile_size, y * self.tile_size), 
+                 surf=surf, groups=self.all_sprites, z=LAYERS['Level'])
         
+        for layer in layers:
+            for x, y, surf in tmx_map.get_layer_by_name(layer).tiles():
+                Tile(pos=(x * self.tile_size, y * self.tile_size), 
+                     surf=surf, groups=self.all_sprites, z=LAYERS[layer])
+        
+        # Objects
         for obj in tmx_map.get_layer_by_name('Entities'):
             if obj.name == 'Player':
                 self.player = Player(pos=(obj.x, obj.y), groups=self.all_sprites)

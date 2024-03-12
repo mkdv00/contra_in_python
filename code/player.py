@@ -11,6 +11,7 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.Surface(size=(40, 80))
         self.image.fill('green')
         self.rect = self.image.get_rect(topleft=pos)
+        self.z = LAYERS['Level']
     
         # movement
         self.pos = Vector2(self.rect.topleft)
