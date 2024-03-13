@@ -33,6 +33,7 @@ class Player(pygame.sprite.Sprite):
         self.jump_speed = 1900
         self.on_floor = False
         self.duck = True
+        self.moving_platform = None
     
     def import_assets(self, path):
         self.animations = {}
@@ -68,6 +69,8 @@ class Player(pygame.sprite.Sprite):
             if sprite.rect.colliderect(bottom_rect):
                 if self.direction.y > 0:
                     self.on_floor = True
+                if hasattr(sprite, 'direction'):
+                    self.moving_platform = sprite
     
     def collision(self, direction):
         for sprite in self.collision_sprites.sprites():
@@ -109,8 +112,17 @@ class Player(pygame.sprite.Sprite):
         # vertical
         self.direction.y += self.gravity
         self.pos.y += self.direction.y * dt
+        
+        # check on the platform
+        if self.moving_platform and self.moving_platform.direction.y > 0 and self.direction.y > 0:
+            self.direction.y = 0
+            self.rect.bottom = self.moving_platform.rect.top
+            self.pos.y = self.rect.y
+            self.on_floor = True
+        
         self.rect.y = round(self.pos.y)
         self.collision(direction='vertical')
+        self.moving_platform = None
     
     def input(self):
         keys = pygame.key.get_pressed()

@@ -2,7 +2,7 @@ import pygame
 from player import Player
 from pytmx.util_pygame import load_pygame
 from settings import *
-from tile import Tile, CollisionTile
+from tile import Tile, CollisionTile, MovingPlatform
 from camera import CameraGroup
 
 
@@ -18,6 +18,7 @@ class Game:
         # groups
         self.all_sprites = CameraGroup()
         self.collision_sprites = pygame.sprite.Group()
+        self.platform_sprites = pygame.sprite.Group()
         
         self.setup()
     
@@ -41,6 +42,34 @@ class Game:
             if obj.name == 'Player':
                 self.player = Player(pos=(obj.x, obj.y), groups=self.all_sprites, 
                                      path='graphics/player', collision_sprites=self.collision_sprites)
+        
+        # Platforms
+        self.platform_border_rects = []
+        for obj in tmx_map.get_layer_by_name('Platforms'):
+            if obj.name == 'Platform':
+                MovingPlatform(pos=(obj.x, obj.y), surf=obj.image,
+                               groups=[self.all_sprites, self.collision_sprites, self.platform_sprites])
+            else:
+                platform_rect = pygame.Rect(obj.x, obj.y, obj.width, obj.height)
+                self.platform_border_rects.append(platform_rect)
+    
+    def platform_collisions(self):
+        for platform in self.platform_sprites.sprites():
+            for border in self.platform_border_rects:
+                if platform.rect.colliderect(border):
+                    if platform.direction.y < 0:
+                        platform.rect.top = border.bottom
+                        platform.pos.y = platform.rect.y
+                        platform.direction.y = 1
+                    else:
+                        platform.rect.bottom = border.top
+                        platform.pos.y = platform.rect.y
+                        platform.direction.y = -1
+            
+            if platform.rect.colliderect(self.player.rect) and self.player.rect.centery > platform.rect.centery:
+                platform.rect.bottom = self.player.rect.top
+                platform.pos.y = platform.rect.y
+                platform.direction.y = -1
     
     def run(self, is_run: bool = True):
         while is_run:
@@ -56,6 +85,7 @@ class Game:
             self.screen.fill((249, 131, 103))
             
             # updates
+            self.platform_collisions()
             self.all_sprites.update(dt)
             
             # draw
