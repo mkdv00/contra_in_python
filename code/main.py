@@ -2,7 +2,7 @@ import pygame
 from player import Player
 from pytmx.util_pygame import load_pygame
 from settings import *
-from tile import Tile
+from tile import Tile, CollisionTile
 from camera import CameraGroup
 
 
@@ -17,6 +17,7 @@ class Game:
         
         # groups
         self.all_sprites = CameraGroup()
+        self.collision_sprites = pygame.sprite.Group()
         
         self.setup()
     
@@ -24,11 +25,12 @@ class Game:
         tmx_map = load_pygame('data/map.tmx')
         layers = ['BG', 'BG Detail', 'FG Detail Bottom', 'FG Detail Top']
         
-        # Tiles
+        # Collision Tiles
         for x, y, surf in tmx_map.get_layer_by_name('Level').tiles():
-            Tile(pos=(x * self.tile_size, y * self.tile_size), 
-                 surf=surf, groups=self.all_sprites, z=LAYERS['Level'])
+            CollisionTile(pos=(x * self.tile_size, y * self.tile_size), surf=surf, 
+                          groups=[self.all_sprites, self.collision_sprites])
         
+        # Tiles
         for layer in layers:
             for x, y, surf in tmx_map.get_layer_by_name(layer).tiles():
                 Tile(pos=(x * self.tile_size, y * self.tile_size), 
@@ -37,7 +39,8 @@ class Game:
         # Objects
         for obj in tmx_map.get_layer_by_name('Entities'):
             if obj.name == 'Player':
-                self.player = Player(pos=(obj.x, obj.y), groups=self.all_sprites, path='graphics/player')
+                self.player = Player(pos=(obj.x, obj.y), groups=self.all_sprites, 
+                                     path='graphics/player', collision_sprites=self.collision_sprites)
     
     def run(self, is_run: bool = True):
         while is_run:
