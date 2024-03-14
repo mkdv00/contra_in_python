@@ -1,9 +1,10 @@
 import pygame
+from bullet import Bullet
+from camera import CameraGroup
 from player import Player
 from pytmx.util_pygame import load_pygame
 from settings import *
-from tile import Tile, CollisionTile, MovingPlatform
-from camera import CameraGroup
+from tile import CollisionTile, MovingPlatform, Tile
 
 
 class Game:
@@ -19,8 +20,12 @@ class Game:
         self.all_sprites = CameraGroup()
         self.collision_sprites = pygame.sprite.Group()
         self.platform_sprites = pygame.sprite.Group()
+        self.bullet_sprites = pygame.sprite.Group()
         
         self.setup()
+        
+        # bullets sprites
+        self.bullet_surf = pygame.image.load('graphics/bullet.png').convert_alpha()
     
     def setup(self):
         tmx_map = load_pygame('data/map.tmx')
@@ -41,7 +46,8 @@ class Game:
         for obj in tmx_map.get_layer_by_name('Entities'):
             if obj.name == 'Player':
                 self.player = Player(pos=(obj.x, obj.y), groups=self.all_sprites, 
-                                     path='graphics/player', collision_sprites=self.collision_sprites)
+                                     path='graphics/player', collision_sprites=self.collision_sprites,
+                                     shoot=self.shoot)
         
         # Platforms
         self.platform_border_rects = []
@@ -71,6 +77,16 @@ class Game:
                 platform.pos.y = platform.rect.y
                 platform.direction.y = -1
     
+    def bullet_collisions(self):
+        # obstacles
+        for obstacle in self.collision_sprites.sprites():
+            pygame.sprite.spritecollide(obstacle, self.bullet_sprites, True)
+        
+        # entities
+    
+    def shoot(self, pos, direction, entity):
+        Bullet(pos, self.bullet_surf, direction, [self.all_sprites, self.bullet_sprites])
+    
     def run(self, is_run: bool = True):
         while is_run:
             
@@ -87,6 +103,7 @@ class Game:
             # updates
             self.platform_collisions()
             self.all_sprites.update(dt)
+            self.bullet_collisions()
             
             # draw
             self.all_sprites.draw_custom(player=self.player)

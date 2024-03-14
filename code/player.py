@@ -7,7 +7,7 @@ from settings import *
 
 class Player(pygame.sprite.Sprite):
     
-    def __init__(self, pos, groups, path, collision_sprites):
+    def __init__(self, pos, groups, path, collision_sprites, shoot):
         super().__init__(groups)
         
         # setup the player
@@ -34,6 +34,14 @@ class Player(pygame.sprite.Sprite):
         self.on_floor = False
         self.duck = True
         self.moving_platform = None
+        
+        # interaction
+        self.shoot = shoot
+        
+        # shoot timer
+        self.shoot_time = None
+        self.can_shoot = True
+        self.shoot_colldown = 200
     
     def import_assets(self, path):
         self.animations = {}
@@ -144,6 +152,23 @@ class Player(pygame.sprite.Sprite):
             self.duck = True
         else:
             self.duck = False
+        
+        # interactions
+        if keys[pygame.K_SPACE] and self.can_shoot:
+            direction = Vector2(1, 0) if self.status.split('_')[0] == 'right' else Vector2(-1, 0)
+            pos = self.rect.center + direction * 60
+            y_offset = Vector2(0, -16) if not self.duck else Vector2(0, 10)
+            self.shoot(pos + y_offset, direction, self)
+            
+            self.can_shoot = False
+            self.shoot_time = pygame.time.get_ticks()
+    
+    def shoot_timer(self):
+        if not self.can_shoot:
+            current_time = pygame.time.get_ticks()
+            
+            if current_time - self.shoot_time > self.shoot_colldown:
+                self.can_shoot = True
     
     def animate(self, dt):
         self.frame_count += 7 * dt
@@ -155,6 +180,7 @@ class Player(pygame.sprite.Sprite):
     def update(self, dt):
         self.old_rect = self.rect.copy()
         self.input()
+        self.shoot_timer()
         self.get_status()
         self.move(dt)
         self.check_contact()
