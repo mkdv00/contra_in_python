@@ -26,3 +26,41 @@ class Bullet(pygame.sprite.Sprite):
         
         if pygame.time.get_ticks() - self.start_time > self.visible_colldown:
             self.kill()
+
+
+class FireAnimations(pygame.sprite.Sprite):
+    
+    def __init__(self, entity, surf_list, direction, groups):
+        super().__init__(groups)
+        
+        # setup
+        self.entity = entity
+        self.frames = surf_list
+        if direction.x < 0:
+            self.frames = [pygame.transform.flip(surf, True, False) for surf in self.frames]
+        
+        # offset
+        offset_x = -60 if direction.x < 0 else 60
+        offset_y = 10 if entity.duck else -16
+        self.offset = Vector2(offset_x, offset_y)
+        
+        # image
+        self.frame_index = 0
+        self.image = self.frames[self.frame_index]
+        self.rect = self.image.get_rect(center=self.entity.rect.center + self.offset)
+        self.z = LAYERS['Level']
+    
+    def animate(self, dt):
+        self.frame_index += 15 * dt
+        
+        if self.frame_index >= len(self.frames):
+            self.kill()
+        else:
+            self.image = self.frames[int(self.frame_index)]
+    
+    def move(self):
+        self.rect.center = self.entity.rect.center + self.offset
+    
+    def update(self, dt):
+        self.animate(dt)
+        self.move()

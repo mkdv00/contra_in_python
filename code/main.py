@@ -1,5 +1,5 @@
 import pygame
-from bullet import Bullet
+from bullet import Bullet, FireAnimations
 from camera import CameraGroup
 from player import Player
 from pytmx.util_pygame import load_pygame
@@ -26,6 +26,10 @@ class Game:
         
         # bullets sprites
         self.bullet_surf = pygame.image.load('graphics/bullet.png').convert_alpha()
+        self.fire_surfs = [
+            pygame.image.load('graphics/fire/0.png').convert_alpha(),
+            pygame.image.load('graphics/fire/1.png').convert_alpha()
+        ]
     
     def setup(self):
         tmx_map = load_pygame('data/map.tmx')
@@ -85,6 +89,7 @@ class Game:
         # entities
     
     def shoot(self, pos, direction, entity):
+        FireAnimations(entity=entity, surf_list=self.fire_surfs, direction=direction, groups=self.all_sprites)
         Bullet(pos, self.bullet_surf, direction, [self.all_sprites, self.bullet_sprites])
     
     def run(self, is_run: bool = True):

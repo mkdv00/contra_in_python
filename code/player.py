@@ -20,6 +20,7 @@ class Player(pygame.sprite.Sprite):
         self.z = LAYERS['Level']
     
         # movement
+        self.velocity = Vector2()
         self.pos = Vector2(self.rect.topleft)
         self.direction = Vector2()
         self.speed = 400
@@ -112,8 +113,12 @@ class Player(pygame.sprite.Sprite):
         if self.duck and self.on_floor:
             self.direction.x = 0
         
+        if self.direction.x == 0:
+            self.velocity = Vector2()
+        
         # horizontal
-        self.pos.x += self.direction.x * self.speed * dt
+        self.velocity.x = self.direction.x * self.speed
+        self.pos.x += self.velocity.x * dt
         self.rect.x = round(self.pos.x)
         self.collision(direction='horizontal')
         
