@@ -21,8 +21,6 @@ class CameraGroup(pygame.sprite.Group):
         self.sky_width = self.bg_sky.get_width()
         self.map_width = map_tmx.width * map_tmx.tilewidth + (2 * self.padding)
         self.sky_count = int(self.map_width // self.sky_width)
-        
-        print(self.sky_width)
     
     def draw_custom(self, player):
         if not isinstance(player, Player):

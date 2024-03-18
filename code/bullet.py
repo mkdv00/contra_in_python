@@ -19,6 +19,7 @@ class Bullet(pygame.sprite.Sprite):
         # bullet timer
         self.start_time = pygame.time.get_ticks()
         self.visible_colldown = 1000
+        self.mask = pygame.mask.from_surface(self.image)
     
     def update(self, dt):
         self.pos += self.direction * self.speed * dt

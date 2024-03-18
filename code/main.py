@@ -1,6 +1,7 @@
 import pygame
 from bullet import Bullet, FireAnimations
 from camera import CameraGroup
+from enemy import Enemy
 from player import Player
 from pytmx.util_pygame import load_pygame
 from settings import *
@@ -21,6 +22,7 @@ class Game:
         self.collision_sprites = pygame.sprite.Group()
         self.platform_sprites = pygame.sprite.Group()
         self.bullet_sprites = pygame.sprite.Group()
+        self.vulnerable_sprites = pygame.sprite.Group()
         
         self.setup()
         
@@ -49,9 +51,18 @@ class Game:
         # Objects
         for obj in tmx_map.get_layer_by_name('Entities'):
             if obj.name == 'Player':
-                self.player = Player(pos=(obj.x, obj.y), groups=self.all_sprites, 
-                                     path='graphics/player', collision_sprites=self.collision_sprites,
+                self.player = Player(pos=(obj.x, obj.y),
+                                     groups=[self.all_sprites, self.vulnerable_sprites],
+                                     path='graphics/player', 
+                                     collision_sprites=self.collision_sprites,
                                      shoot=self.shoot)
+            if obj.name == 'Enemy':
+                Enemy(pos=(obj.x, obj.y),
+                      groups=[self.all_sprites, self.vulnerable_sprites], 
+                      path='graphics/enemies/standard', 
+                      shoot=self.shoot, 
+                      player=self.player,
+                      collision_sprites=self.collision_sprites)
         
         # Platforms
         self.platform_border_rects = []
@@ -87,6 +98,9 @@ class Game:
             pygame.sprite.spritecollide(obstacle, self.bullet_sprites, True)
         
         # entities
+        for sprite in self.vulnerable_sprites.sprites():
+            if pygame.sprite.spritecollide(sprite, self.bullet_sprites, True, pygame.sprite.collide_mask):
+                sprite.damage(damage_amount=1)
     
     def shoot(self, pos, direction, entity):
         FireAnimations(entity=entity, surf_list=self.fire_surfs, direction=direction, groups=self.all_sprites)
