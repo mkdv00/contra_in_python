@@ -16,6 +16,7 @@ class Enemy(Entity):
         
         self.shoot_colldown = 900
         self.duck = False
+        self.invulerable_cooldown = 200
     
     def get_status(self):
         if self.player.rect.centerx < self.rect.centerx:

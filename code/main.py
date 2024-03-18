@@ -34,6 +34,17 @@ class Game:
             pygame.image.load('graphics/fire/0.png').convert_alpha(),
             pygame.image.load('graphics/fire/1.png').convert_alpha()
         ]
+        
+        # music
+        self.bullet_sound = pygame.mixer.Sound(file='audio/bullet.wav')
+        self.bullet_sound.set_volume(0.15)
+        
+        self.hit_sound = pygame.mixer.Sound(file='audio/hit.wav')
+        self.hit_sound.set_volume(0.15)
+        
+        self.music = pygame.mixer.Sound(file='audio/music.wav')
+        self.music.set_volume(0.3)
+        self.music.play(loops=-1)
     
     def setup(self):
         tmx_map = load_pygame('data/map.tmx')
@@ -103,10 +114,12 @@ class Game:
         for sprite in self.vulnerable_sprites.sprites():
             if pygame.sprite.spritecollide(sprite, self.bullet_sprites, True, pygame.sprite.collide_mask):
                 sprite.damage(damage_amount=1)
+                self.hit_sound.play(loops=1)
     
     def shoot(self, pos, direction, entity):
         FireAnimations(entity=entity, surf_list=self.fire_surfs, direction=direction, groups=self.all_sprites)
         Bullet(pos, self.bullet_surf, direction, [self.all_sprites, self.bullet_sprites])
+        self.bullet_sound.play(loops=1)
     
     def run(self, is_run: bool = True):
         while is_run:

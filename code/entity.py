@@ -1,9 +1,9 @@
 import os
+from math import sin
 
 import pygame
 from pygame.math import Vector2
 from settings import *
-from math import sin
 
 
 class Entity(pygame.sprite.Sprite):
