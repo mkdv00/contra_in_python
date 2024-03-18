@@ -33,14 +33,14 @@ class Entity(pygame.sprite.Sprite):
         self.shoot = shoot
         self.shoot_time = None
         self.can_shoot = True
-        self.shoot_colldown = 500
+        self.shoot_colldown = 200
         self.duck = True
         
         # health
         self.health = 3
         self.can_take_damage = True
         self.invulerable_time = None
-        self.invulerable_cooldown = 200
+        self.invulerable_cooldown = 500
     
     def blink(self):
         if not self.can_take_damage:

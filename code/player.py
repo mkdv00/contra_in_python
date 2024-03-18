@@ -19,6 +19,8 @@ class Player(Entity):
         self.jump_speed = 1900
         self.on_floor = False
         self.moving_platform = None
+        
+        self.health = 10
     
     def get_status(self):
         # idle

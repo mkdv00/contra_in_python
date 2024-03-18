@@ -2,6 +2,7 @@ import pygame
 from bullet import Bullet, FireAnimations
 from camera import CameraGroup
 from enemy import Enemy
+from overlay import Overlay
 from player import Player
 from pytmx.util_pygame import load_pygame
 from settings import *
@@ -25,6 +26,7 @@ class Game:
         self.vulnerable_sprites = pygame.sprite.Group()
         
         self.setup()
+        self.overlay = Overlay(player=self.player)
         
         # bullets sprites
         self.bullet_surf = pygame.image.load('graphics/bullet.png').convert_alpha()
@@ -126,6 +128,7 @@ class Game:
             
             # draw
             self.all_sprites.draw_custom(player=self.player)
+            self.overlay.display()
             
             pygame.display.update()
         
